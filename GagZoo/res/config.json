@@ -1,0 +1,52 @@
+{
+    "init_crowd_satisfaction": 0.5,
+    "guest_types": ["cat", "dog", "shark", "bird", "pirate"],
+    "joke_types": ["cat", "dog", "shark", "bird", "pirate", "karen", "dad_jokes"],
+    "joke_modifiers": {"positive": 1.0, "negative": -1.0, "neutral": 0},
+    "joke_effects": [
+    {
+        "guest_type": "cat",
+        "positive": ["dog", "bird", "karen", "dad_jokes"],
+        "negative": ["cat", "pirate"],
+        "neutral": ["shark", "pirate"]
+    },
+    {
+        "guest_type": "dog",
+        "positive": ["cat", "karen", "dad_jokes"],
+        "negative": ["dog", "shark"],
+        "neutral": ["bird", "pirate"]
+    },
+    {
+        "guest_type": "shark",
+        "positive": ["bird", "pirate", "karen", "dad_jokes"],
+        "negative": ["dog", "shark"],
+        "neutral": ["cat"]
+    },
+    {
+        "guest_type": "birds",
+        "positive": ["cat", "shark", "karen", "dad_jokes"],
+        "negative": ["bird", "pirate"],
+        "neutral": ["dog"]
+    },
+    {
+        "guest_type": "pirate",
+        "positive": ["shark", "pirate", "karen", "dad_jokes"],
+        "negative": ["cat", "bird"],
+        "neutral": ["dog"]
+    }],
+    "guest_positions": [
+    [ 0.0, 0.0 ],
+    [ 0.0, 0.0 ],
+    [ 0.0, 0.0 ],
+    [ 0.0, 0.0 ],
+    [ 0.0, 0.0 ],
+    [ 0.0, 0.0 ],
+    [ 0.0, 0.0 ],
+    [ 0.0, 0.0 ],
+    [ 0.0, 0.0 ],
+    [ 0.0, 0.0 ],
+    [ 0.0, 0.0 ],
+    [ 0.0, 0.0 ],
+    [ 0.0, 0.0 ]
+    ] 
+}
