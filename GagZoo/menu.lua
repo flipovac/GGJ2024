@@ -19,7 +19,7 @@ local playBtn
 local function onPlayBtnRelease()
 	
 	-- go to level1.lua scene
-	composer.gotoScene( "level1", "fade", 500 )
+	composer.gotoScene( "intro-backstory", "fade", 500 )
 	
 	return true	-- indicates successful touch
 end
@@ -33,7 +33,7 @@ function scene:create( event )
 	-- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
 
 	-- display a background image
-	local background = display.newImageRect( "res/img/background.jpg", display.actualContentWidth, display.actualContentHeight )
+	local background = display.newImageRect( "res/img/background/background.jpg", display.actualContentWidth, display.actualContentHeight )
 	background.anchorX = 0
 	background.anchorY = 0
 	background.x = 0 + display.screenOriginX 
