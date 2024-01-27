@@ -4,6 +4,7 @@
 --
 -----------------------------------------------------------------------------------------
 local helper = require "helper"
+local json = require "json"
 
 pirateJokes = {}
 catJokes = {}
@@ -17,7 +18,14 @@ helper.populateTable( dogJokes, "res/jokes/dog.txt" )
 helper.populateTable( sharkJokes, "res/jokes/shark.txt" )
 helper.populateTable( birdJokes, "res/jokes/bird.txt" )
 
-helper.shuffleTable( pirateJokes )
+-- read json configuration and load
+
+jsonConfig = nil
+
+local filename = system.pathForFile( "config.json", system.ResourceDirectory )
+jsonConfig, pos, msg = json.decodeFile(filename)
+if not jsonConfig then
+    error("ERROR! Config not loaded")
 
 -- print( #pirateJokes )
 -- for i,v in ipairs(pirateJokes) do print(i,v) end
