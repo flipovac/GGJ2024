@@ -11,11 +11,11 @@ dogJokes = {}
 sharkJokes = {}
 birdJokes = {}
 
-helper.populateTable( pirateJokes, "res/text/pirate.txt" )
-helper.populateTable( catJokes, "res/text/cat.txt" )
-helper.populateTable( dogJokes, "res/text/dog.txt" )
-helper.populateTable( sharkJokes, "res/text/shark.txt" )
-helper.populateTable( birdJokes, "res/text/bird.txt" )
+helper.populateTable( pirateJokes, "res/jokes/pirate.txt" )
+helper.populateTable( catJokes, "res/jokes/cat.txt" )
+helper.populateTable( dogJokes, "res/jokes/dog.txt" )
+helper.populateTable( sharkJokes, "res/jokes/shark.txt" )
+helper.populateTable( birdJokes, "res/jokes/bird.txt" )
 
 helper.shuffleTable( pirateJokes )
 
