@@ -3,46 +3,24 @@
 -- main.lua
 --
 -----------------------------------------------------------------------------------------
+local helper = require "helper"
 
--- function dump(o)
---     if type(o) == 'table' then
---        local s = '{ '
---        for k,v in pairs(o) do
---           if type(k) ~= 'number' then k = '"'..k..'"' end
---           s = s .. '['..k..'] = ' .. dump(v) .. ','
---        end
---        return s .. '} '
---     else
---        return tostring(o)
---     end
---  end
+pirateJokes = {}
+catJokes = {}
+dogJokes = {}
+sharkJokes = {}
+birdJokes = {}
 
+helper.populateTable( pirateJokes, "res/text/pirate.txt" )
+helper.populateTable( catJokes, "res/text/cat.txt" )
+helper.populateTable( dogJokes, "res/text/dog.txt" )
+helper.populateTable( sharkJokes, "res/text/shark.txt" )
+helper.populateTable( birdJokes, "res/text/bird.txt" )
 
--- -- Path for the file to read
--- local path = system.pathForFile( "/res/texts/pirate.txt", system.ResourceDirectory )
+helper.shuffleTable( pirateJokes )
 
--- print(path)
--- -- Open the file handle
--- local file, errorString = io.open( path, "r" )
-
--- local pirateJoke = {}
- 
--- if not file then
---     -- Error occurred; output the cause
---     print( "File error: " .. errorString )
--- else
---     -- Output lines
---     for line in file:lines() do
---         table.insert( pirateJoke, line )
---         print( line )
---     end
---     -- Close the file handle
---     io.close( file )
--- end
-
--- -- dump( pirateJoke )
- 
--- file = nil
+-- print( #pirateJokes )
+-- for i,v in ipairs(pirateJokes) do print(i,v) end
 
 
 -- hide the status bar
