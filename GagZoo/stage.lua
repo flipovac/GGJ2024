@@ -13,26 +13,243 @@
 --
 -----------------------------------------------------------------------------------------
 
+-- ##############################################
+-- variables
+-- ##############################################
+local helper = require "helper"
 local composer = require( "composer" )
 local scene = composer.newScene()
 
---------------------------------------------
+math.randomseed(os.time())
 
 -- forward declarations and other locals
 local screenW, screenH, halfW = display.actualContentWidth, display.actualContentHeight, display.contentCenterX
+
+local stageCrowd = {}
+
+local MAX_CROWD_SCORE = 1.0
+local MIN_CROWD_SCORE = 0.0
+
+local crowdSatisfaction = 0.0
+
+local currentJokeCards = {}
+
+local jokeModifier = {}
+
+-- Class definitions
+
+local Crowd = {}
+local Guest = {}
+local Cards = {}
+
+function Crowd:new()
+    local newObject = setmetatable({}, self)
+	self.__index = self
+
+    self.guests = {}
+	
+	Crowd:createStageCrowd()
+	print("kreiran crowd");
+	return newObject
+end
+
+function Crowd:createStageCrowd()
+	print("create guests function! ")
+	local positions = jsonConfiguration["guest_positions"]
+	if not positions then
+		error("ERROR! Missing positions ")
+	end
+
+	for i, position in ipairs(positions) do
+		print("dodan guest!");
+		local newGuest = Guest:new(i, position)
+		newGuest:reset(getNextGuestType())
+		self.guests[i] = newGuest 
+	end
+end
+
+function Crowd:resetAngryGuests()
+	for i, guest in ipairs(stageCrowd.guests) do
+		if guest.state == "negative" then
+			guest:reset(getNextGuestType())
+		end
+	end
+end
+
+
+function Crowd:display()
+	-- todo: prikaz na svaki update crowda, 
+	-- crtaju se indeksom od prvog indeksa koji je u zadnjem redu lijevo do prvog reda desno 
+end
+
+function Guest:new( _positionIndex , _position)
+	local newObject = setmetatable({}, self)
+	self.__index = self
+
+    self.positionIndex = _positionIndex
+    self.position = _position
+
+    self.type = nil
+    self.scoreModifier = 1.0
+    self.state = "neutral"
+
+	return newObject
+end
+
+function Guest:rateJoke(_joke)
+	local score = 0;
+	local jokeEffect = "neutral"
+	local jokeEffects = jsonConfiguration["joke_effects"]
+
+	if not jokeEffects["positive"][self.type] then
+		if not jokeEffects["negative"][self.type] then
+			jokeEffect = "neutral"
+		else
+			jokeEffect = "negative"
+		end
+	else
+		jokeEffect = "positive"
+	end
+	
+	score = jokeModifier[jokeEffect] * self.scoreModifier
+
+	return score, jokeEffect;
+end
+
+function Guest:reset( _type )
+	self.type = _type
+	self.scoreModifier = 1.0
+	self.state = "neutral"
+end
+
+function Guest:setState ( _state )
+	self.state = _state
+end
+
+function Guest:setType(_type)
+	self.type = _type
+end
+
+function Guest:incrementModifier()
+	self.scoreModifier = self.scoreModifier + 0.1
+end
+
+function Cards:new()
+	local newObject = setmetatable({}, self)
+	self.__index = self
+
+	self.cards = {}
+
+	return newObject
+end
+
+-- ##############################################
+-- Functions
+-- ##############################################
+
+function shuffleAllJokes( )
+	helper.shuffleTable( pirateJokes )
+	helper.shuffleTable( catJokes )
+	helper.shuffleTable( dogJokes )
+	helper.shuffleTable( sharkJokes )
+	helper.shuffleTable( birdJokes )
+end
+
+function getNextGuestType()
+	local guestTypes = jsonConfiguration["guest_types"]
+	local guestIndex = math.random(0, 100) % #guestTypes + 1;
+
+	return guestTypes[guestIndex] 
+
+-- todo: novi tip gosta na random ili da se ne ponovi svi isti, da postoji omjer
+end
+
+function getNextJoke()
+	-- todo: dohvati novi joke iz deka/ random ali da nisu u ruci svi istog tipa
+end
+
+function playJoke( _joke )
+	local totalScore = 0.0
+
+	for i, guest in ipairs(stageCrowd.guests) do
+		local score, jokeEffect = guest:rateJoke(_joke)
+		
+		guest:setState(jokeEffect)
+
+		totalScore = totalScore + score
+	end
+
+	return totalScore
+end
+
+function checkEndgame()
+	if crowdObjectiveEffect == "positive" then
+		if crowdSatisfaction >= MAX_CROWD_SCORE then
+			endGame(true)
+		elseif crowdSatisfaction <= MIN_CROWD_SCORE then
+			endGame(false)
+		end
+	else
+		if crowdSatisfaction <= MIN_CROWD_SCORE then
+			endGame(true)
+		elseif crowdSatisfaction >= MAX_CROWD_SCORE then
+			endgame(false)
+		end
+	end
+
+	return 
+end
+
+function endGame( _isWin )
+
+	--todo: endgame, switch scenswitchAe and destroy current
+end
+
+
+-- ##############################################
+-- Framework functions
+-- ##############################################
 
 function scene:create( event )
 
 	-- Called when the scene's view does not exist.
 	-- 
 	-- INSERT code here to initialize the scene
-	-- e.g. add display objects to 'sceneGroup', add touch listeners, etc.
+	-- e.g. add display objects to
+	-- local sceneGroup = self.view 'sceneGroup', add touch listeners, etc.
+	
+	print("pocetak ---------------------");
+
+	crowdSatisfcation = jsonConfiguration["init_crowd_satisfaction"]
+	
+	crowdObjectiveEffect = jsonConfiguration["crowd_objective"]
+	
+	stageCrowd = Crowd:new()
+
+	shuffleAllJokes()
 
 	local sceneGroup = self.view
 	
+	local background = display.newImageRect( "res/img/background/scene.jpg", display.actualContentWidth, display.actualContentHeight )
+	background.anchorX = 0
+	background.anchorY = 0
+	background.x = 0 + display.screenOriginX 
+	background.y = 0 + display.screenOriginY
+
+	sceneGroup:insert( background )
+
+	for i, guest in ipairs(stageCrowd.guests) do
+		guest.image = display.newImageRect( "res/img/characters/shark-neutral.png", 0.977 * guest.position[3], guest.position[3] )
+		guest.image.anchorX = 0.5
+		guest.image.anchorY = 0.5
+		guest.image.x = background.width * guest.position[1] + display.screenOriginX 
+		guest.image.y = background.height * guest.position[2] + display.screenOriginY 
+		
+		sceneGroup:insert(guest.image)
+	end
+
 	-- all display objects must be inserted into group
 end
-
 
 function scene:show( event )
 	local sceneGroup = self.view
@@ -60,7 +277,7 @@ function scene:hide( event )
 	end	
 	
 end
-
+    
 function scene:destroy( event )
 
 	-- Called prior to the removal of scene's "view" (sceneGroup)
