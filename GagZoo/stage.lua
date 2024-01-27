@@ -62,8 +62,12 @@ function Crowd:createStageCrowd()
 
 	for i, position in ipairs(positions) do
 		print("dodan guest!");
-		local newGuest = Guest:new(i, position)
+		local newGuest = Guest:new()
+
+		newGuest.positionIndex = i
+		newGuest.position = position 
 		newGuest:reset(getNextGuestType())
+
 		self.guests[i] = newGuest 
 	end
 end
@@ -82,12 +86,12 @@ function Crowd:display()
 	-- crtaju se indeksom od prvog indeksa koji je u zadnjem redu lijevo do prvog reda desno 
 end
 
-function Guest:new( _positionIndex , _position)
+function Guest:new()
 	local newObject = setmetatable({}, self)
 	self.__index = self
 
-    self.positionIndex = _positionIndex
-    self.position = _position
+    self.positionIndex = {}
+    self.position = {}
 
     self.type = nil
     self.scoreModifier = 1.0
@@ -239,7 +243,7 @@ function scene:create( event )
 	sceneGroup:insert( background )
 
 	for i, guest in ipairs(stageCrowd.guests) do
-		guest.image = display.newImageRect( "res/img/characters/shark-neutral.png", 0.977 * guest.position[3], guest.position[3] )
+		guest.image = display.newImageRect( "res/img/characters/" .. guest.type .. "-neutral.png", 0.977 * guest.position[3], guest.position[3] )
 		guest.image.anchorX = 0.5
 		guest.image.anchorY = 0.5
 		guest.image.x = background.width * guest.position[1] + display.screenOriginX 
