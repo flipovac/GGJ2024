@@ -1,6 +1,15 @@
+------------------------------------------
+-- Postoji vrsta publike, svaki tip publike ima svoj tip i on reagira na neki nacin na joke 
+-- Postoji vrsta joke-a, svaki joke pozitivno, negativno ili neutralno na neku kategoriju publike (+, - , 0)
+-- Player ima za izbor jedan od 3-4 kartice, svaka kartica je jedan joke (hoce li biti neki uvijek random)
+-- Snimiti prezentaciju likova koji su u publici, zivotinje i onda pirat (wait, a pirat ?!)
+-- odlazi publika koja nije zadovoljna i zamjenjuje se random novom publikom
+-- kartice koje dolaze sa jokes se prvo sortiraju na random i onda idu po indeksu
+------------------------------------------
+
 -----------------------------------------------------------------------------------------
 --
--- level1.lua
+-- stage.lua
 --
 -----------------------------------------------------------------------------------------
 
