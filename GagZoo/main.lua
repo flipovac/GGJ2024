@@ -20,13 +20,13 @@ helper.populateTable( birdJokes, "res/jokes/bird.txt" )
 
 -- read json configuration and load
 
-jsonConfig = nil
+jsonConfiguration = {}
 
-local filename = system.pathForFile( "config.json", system.ResourceDirectory )
-jsonConfig, pos, msg = json.decodeFile(filename)
-if not jsonConfig then
-    error("ERROR! Config not loaded")
-
+local filename = system.pathForFile( "res/config.json", system.ResourceDirectory)
+jsonConfiguration, pos, msg = json.decodeFile(filename)
+if not jsonConfiguration then
+    error(msg)
+end
 -- print( #pirateJokes )
 -- for i,v in ipairs(pirateJokes) do print(i,v) end
 
@@ -38,4 +38,4 @@ display.setStatusBar( display.HiddenStatusBar )
 local composer = require "composer"
 
 -- load menu screen
-composer.gotoScene( "menu" )
+composer.gotoScene( "stage" )
