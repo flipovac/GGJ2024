@@ -1,6 +1,5 @@
 {
     "init_crowd_satisfaction": 0.5,
-    "goal_crowd_satisfcation": 0,
     "crowd_objective": "negative",
     "joke_cards": 3,
     "guest_types": [
