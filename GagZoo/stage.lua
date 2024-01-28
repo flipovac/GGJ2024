@@ -412,7 +412,7 @@ function pickCardListener( event )
 					card.cardGroup, {
 						time=1000, 
 						delay=2000,
-						alpha=0,     
+						alpha=0,
 						onComplete = function()
 							playJoke(playedCardIndex)
 						end
@@ -436,24 +436,26 @@ function getCrowdReaction(_totalScore)
 	stageCrowd:display()
 
 
-	local options =
-	{
-		channel = 3,
-		loops = -1,
-		fadein = 2000,
-		onComplete=onCrowdReactionComplete
-	}
+	-- local options =
+	-- {
+	-- 	channel = 3,
+	-- 	loops = -1,
+	-- 	fadein = 2000,
+	-- 	onComplete=onCrowdReactionComplete
+	-- }
 
-	local crowdSound = {}
-	if _totalScore > 0 then
-		crowdSound = positiveSounds[positiveSoundsIndex % #positiveSounds + 1]
-		positiveSoundsIndex = positiveSoundsIndex + 1
-	else
-		crowdSound = negativeSounds[negativeSoundsIndex % #negativeSounds + 1]
-		negativeSoundsIndex = negativeSoundsIndex + 1
-	end
+	-- local crowdSound = {}
+	-- if _totalScore > 0 then
+	-- 	crowdSound = positiveSounds[positiveSoundsIndex % #positiveSounds + 1]
+	-- 	positiveSoundsIndex = positiveSoundsIndex + 1
+	-- else
+	-- 	crowdSound = negativeSounds[negativeSoundsIndex % #negativeSounds + 1]
+	-- 	negativeSoundsIndex = negativeSoundsIndex + 1
+	-- end
 
-	audio.play(crowdSound, options)
+	-- audio.play(crowdSound, options)
+
+	timer.performWithDelay(2000,onCrowdReactionComplete, -1);
 end
 
 function onCrowdReactionComplete()
