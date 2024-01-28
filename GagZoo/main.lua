@@ -40,4 +40,4 @@ local composer = require "composer"
 introSound = audio.loadSound( "res/audio/intro.wav" )
 gameplaySound = audio.loadSound( "res/audio/gameplay.wav" )
 -- load menu screen
-composer.gotoScene( "stage" )
+composer.gotoScene( "intro-backstory" )
