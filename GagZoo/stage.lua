@@ -504,14 +504,77 @@ function checkEndgame()
 end
 
 function endGame( _isWin )
+
+	local curtainLeft = display.newImageRect( "res/img/background/curtain-left.png", display.actualContentWidth, display.actualContentHeight )
+	curtainLeft.anchorX = 0
+	curtainLeft.anchorY = 0
+	curtainLeft.x = -screenW 
+	curtainLeft.y = 0 + display.screenOriginY
+
 	
-	if _isWIn then
-		error("You win!")
+	-- curtainLeft.alpha = 0
+
+	
+	local curtainRight = display.newImageRect( "res/img/background/curtain-right.png", display.actualContentWidth, display.actualContentHeight )
+	curtainRight.anchorX = 0
+	curtainRight.anchorY = 0
+	curtainRight.x = screenW + display.screenOriginX
+	curtainRight.y = 0 + display.screenOriginY
+	-- curtainRight.alpha = 0
+
+
+	transition.to(
+		curtainLeft, 
+		{
+			time=3300, 
+			delay=500,
+			x= 0 + display.screenOriginX,     
+			-- onComplete = function()
+			-- end
+		}
+	)
+
+	transition.to(
+		curtainRight, 
+		{
+			time=3200, 
+			delay=500,
+			x=0 + display.screenOriginX    
+			-- onComplete = function()
+			-- 	-- isShowCardsTransition = false
+			-- end
+		}
+	)
+
+	local errorText = display.newText( "dadad", 0, 0, native.systemFont, 34 )
+    errorText.x = halfW ; errorText.y = screenH / 2
+    errorText:setFillColor( 1, 1, 1 )
+    errorText.alpha = 0
+    -- errorText.anchorX = 0
+
+	
+	if _isWin then
+		errorText.text = "You win, now you can go and heal people!"
 	else
-		error("You lose")
+		errorText.text = "You lose, happy parents, happy life"
 	end
 
-	composer.removeScene( "stage", false )
+	errorText:toFront()
+
+
+	transition.to(
+		errorText, 
+		{
+			time=500, 
+			delay=3700,
+			alpha=1  
+			-- onComplete = function()
+			-- 	-- isShowCardsTransition = false
+			-- end
+		}
+	)
+
+	-- composer.removeScene( "stage", false )
 	--todo: endgame, switch scenswitchAe and destroy current
 end
 
