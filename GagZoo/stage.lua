@@ -357,7 +357,7 @@ function Cards:prepareCardImages()
 end
 
 function Cards:replaceCardJoke(_cardIndex)
-	cards[_cardIndex]:getNextJoke()
+	self.cards[_cardIndex]:getNextJoke()
 end
 
 -- ##############################################
@@ -472,7 +472,9 @@ end
 
 function playJoke( _cardIndex )
 	local totalScore = 0.0
-	local jokeType = jokeCards.cards[_cardIndex].jokeType
+	local playedCard = jokeCards.cards[_cardIndex]
+
+	local jokeType = playedCard.jokeType
 
 	for i, guest in ipairs(stageCrowd.guests) do
 		local score, jokeEffect = guest:rateJoke(jokeType)
@@ -481,6 +483,8 @@ function playJoke( _cardIndex )
 
 		totalScore = totalScore + score
 	end
+
+	playedCard
 
 	crowdSatisfaction = crowdSatisfaction + totalScore
 
