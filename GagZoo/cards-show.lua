@@ -102,7 +102,7 @@ function scene:create( event )
 
 	local cardWidth = 600
 
-	cards[1] = display.newImageRect( "res/img/card.png", cardWidth * 0.69, cardWidth )
+	cards[1] = display.newImageRect( "res/img/note.png", cardWidth * 0.69, cardWidth )
 	cards[1].id = 1
 	cards[1].anchorX = 0.5
 	cards[1].anchorY = 0.5
@@ -112,7 +112,7 @@ function scene:create( event )
 	cards[1]:addEventListener( "tap", cardTapListener ) 
 
 
-	cards[2] = display.newImageRect( "res/img/card.png", cardWidth * 0.69, cardWidth )
+	cards[2] = display.newImageRect( "res/img/note.png", cardWidth * 0.69, cardWidth )
 	cards[2].id = 2
 	cards[2].anchorX = 0.5
 	cards[2].anchorY = 0.5
@@ -120,9 +120,9 @@ function scene:create( event )
 	cards[2].y = 0 - 30
 	cards[2]:addEventListener( "tap", cardTapListener ) 
 
-	cards[3] = display.newImageRect( "res/img/card.png", cardWidth * 0.69, cardWidth )
+	cards[3] = display.newImageRect( "res/img/note.png", cardWidth * 0.69, cardWidth )
 	cards[3].id = 3
-	cards[3].anchorX = 0.5
+	cards[3].anchorX = 0.5	
 	cards[3].anchorY = 0.5
 	cards[3]:rotate( 3 )
 	cards[3].x = 530 * 0.69
