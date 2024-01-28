@@ -498,7 +498,7 @@ function checkEndgame()
 		if crowdSatisfaction <= MIN_CROWD_SCORE then
 			endGame(true)
 		elseif crowdSatisfaction >= MAX_CROWD_SCORE then
-			endgame(false)
+			endGame(false)
 		end
 	end
 end
