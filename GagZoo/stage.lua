@@ -36,6 +36,10 @@ local currentJokeCards = {}
 
 local jokeModifier = {}
 
+local sceneGoup = nil
+
+local guestImages = {}
+
 -- Class definitions
 
 local Crowd = {}
@@ -47,8 +51,7 @@ function Crowd:new()
 	self.__index = self
 
     self.guests = {}
-	
-	Crowd:createStageCrowd()
+
 	print("kreiran crowd");
 	return newObject
 end
@@ -80,10 +83,39 @@ function Crowd:resetAngryGuests()
 	end
 end
 
+function Crowd:prepareImageRects()
+	for i, guest in ipairs(stageCrowd.guests) do
+		-- samo rect , fill dolazi kasnije u displayu
+		guest.image = display.newRect(0, 0, 0.977 * guest.position[3], guest.position[3] )
+		guest.image.anchorX = 0.5
+		guest.image.anchorY = 0.5
+		guest.image.x = screenW * guest.position[1] + display.screenOriginX 
+		guest.image.y = screenH * guest.position[2] + display.screenOriginY 
+		guest.image.isVisible = false
+
+		guest.annoyedSymbol = display.newImageRect( "res/img/anger_symbol.png", 0.2 * guest.position[3], 0.2 * guest.position[3] )
+		guest.annoyedSymbol.anchorX = 0.5
+		guest.annoyedSymbol.anchorY = 0.5
+		guest.annoyedSymbol.rotation = 30
+		guest.annoyedSymbol.x = screenW * guest.position[1] + display.screenOriginX + guest.position[3] / 4.5 
+		guest.annoyedSymbol.y = screenH * guest.position[2] + display.screenOriginY - guest.position[3] / 4
+		guest.annoyedSymbol.isVisible = false
+
+		sceneGroup:insert(guest.image)
+		sceneGroup:insert(guest.annoyedSymbol)
+	end
+end
 
 function Crowd:display()
-	-- todo: prikaz na svaki update crowda, 
-	-- crtaju se indeksom od prvog indeksa koji je u zadnjem redu lijevo do prvog reda desno 
+	for i, guest in ipairs(stageCrowd.guests) do
+		guest.image.fill = guestImages[guest.type][guest.state]
+		guest.image.isVisible = true;
+
+		guest.annoyedSymbol.isVisible = guest.state == "negative"
+
+		sceneGroup:insert(guest.image)
+		sceneGroup:insert(guest.annoyedSymbol)
+	end
 end
 
 function Guest:new()
@@ -98,7 +130,7 @@ function Guest:new()
     self.state = "neutral"
 
 	self.image = {}
-	self.annoying_symbol = {}
+	self.annoyed_symbol = {}
 
 	return newObject
 end
@@ -126,7 +158,7 @@ end
 function Guest:reset( _type )
 	self.type = _type
 	self.scoreModifier = 1.0
-	self.state = "negative"
+	self.state = "neutral"
 end
 
 function Guest:setState ( _state )
@@ -163,12 +195,11 @@ function shuffleAllJokes( )
 end
 
 function getNextGuestType()
+	-- todo: novi tip gosta na random ili da se ne ponovi svi isti, da postoji omjer
 	local guestTypes = jsonConfiguration["guest_types"]
 	local guestIndex = math.random(0, 100) % #guestTypes + 1;
 
-	return guestTypes[guestIndex] 
-
--- todo: novi tip gosta na random ili da se ne ponovi svi isti, da postoji omjer
+	return guestTypes[guestIndex]
 end
 
 function getNextJoke()
@@ -212,6 +243,22 @@ function endGame( _isWin )
 	--todo: endgame, switch scenswitchAe and destroy current
 end
 
+-----------------------------------------------
+function loadGuestImages()
+	local guestTypes = jsonConfiguration["guest_types"]
+	
+	for i, guestType in ipairs(guestTypes) do 
+		-- todo: ako dobijemo positive onda promjeniti, inace ne
+		local imagePositive = { type="image", filename="res/img/characters/".. guestType .."-neutral.png" }
+		local imageNegative = { type="image", filename="res/img/characters/".. guestType .."-negative.png" }
+		local imageNeutral = { type="image", filename="res/img/characters/".. guestType .."-neutral.png" }
+
+		guestImages[guestType] = {}
+		guestImages[guestType]["positive"] = imagePositive
+		guestImages[guestType]["negative"] = imageNegative
+		guestImages[guestType]["neutral"] = imageNeutral
+ 	end
+end 
 
 -- ##############################################
 -- Framework functions
@@ -225,65 +272,52 @@ function scene:create( event )
 	-- e.g. add display objects to
 	-- local sceneGroup = self.view 'sceneGroup', add touch listeners, etc.
 	
-	print("pocetak ---------------------");
-
-	crowdSatisfcation = jsonConfiguration["init_crowd_satisfaction"] * MAX_CROWD_SCORE
+	sceneGroup = self.view
 	
-	crowdObjectiveEffect = jsonConfiguration["crowd_objective"]
-	
-	stageCrowd = Crowd:new()
-
-	shuffleAllJokes()
-
-	local sceneGroup = self.view
+	-- load static assets/images
 	
 	local background = display.newImageRect( "res/img/background/scene.jpg", display.actualContentWidth, display.actualContentHeight )
 	background.anchorX = 0
 	background.anchorY = 0
 	background.x = 0 + display.screenOriginX 
 	background.y = 0 + display.screenOriginY
-
-	sceneGroup:insert( background )
-
+	
 	local foxy = display.newImageRect( "res/img/characters/foxy.png", display.actualContentWidth, display.actualContentHeight )
 	foxy.anchorX = 0
 	foxy.anchorY = 0
 	foxy.x = 0 + display.screenOriginX 
 	foxy.y = 0 + display.screenOriginY
 
+	sceneGroup:insert( background )
 	sceneGroup:insert( foxy )
+ 	
+	loadGuestImages()
 
-	for i, guest in ipairs(stageCrowd.guests) do
-		guest.image = display.newImageRect( "res/img/characters/" .. guest.type .. "-".. guest.state .. ".png", 0.977 * guest.position[3], guest.position[3] )
-		guest.image.anchorX = 0.5
-		guest.image.anchorY = 0.5
-		guest.image.x = background.width * guest.position[1] + display.screenOriginX 
-		guest.image.y = background.height * guest.position[2] + display.screenOriginY 
-		guest.image.isVisible = true
+	-- setup game specific parameters
 
-		guest.annoying_symbol = display.newImageRect( "res/img/anger_symbol.png", 0.2 * guest.position[3], 0.2 * guest.position[3] )
-		guest.annoying_symbol.anchorX = 0.5
-		guest.annoying_symbol.anchorY = 0.5
-		guest.annoying_symbol.rotation = 30
-		guest.annoying_symbol.x = background.width * guest.position[1] + display.screenOriginX + guest.position[3] / 4.5 
-		guest.annoying_symbol.y = background.height * guest.position[2] + display.screenOriginY - guest.position[3] / 4
-		guest.annoying_symbol.isVisible = true
-		sceneGroup:insert(guest.image)
+	crowdSatisfcation = jsonConfiguration["init_crowd_satisfaction"] * MAX_CROWD_SCORE
+	
+	crowdObjectiveEffect = jsonConfiguration["crowd_objective"]
+	
+	stageCrowd = Crowd:new()
+	Crowd:createStageCrowd()
+	Crowd:prepareImageRects()
 
-		sceneGroup:insert(guest.annoying_symbol)
-	end
+	shuffleAllJokes()
+
+	stageCrowd:display()
 
 	-- draw status
 
 	-- status border
-	local statusBorderRect = display.newRect(-100, background.height / 2, background.width * 0.05, background.height/3 )
+	local statusBorderRect = display.newRect(display.screenOriginX + 100, background.height / 2, background.width * 0.05, background.height/3 )
 	statusBorderRect.strokeWidth = 5
 	statusBorderRect.anchorX = 0
 	statusBorderRect.anchorY = 1
 	statusBorderRect:setFillColor(0,0,0,0)
 	statusBorderRect:setStrokeColor(.1,.2,1)
 
-	local statusRect = display.newRect(-100, background.height / 2, background.width * 0.05, background.height/3)
+	local statusRect = display.newRect(display.screenOriginX + 100 , background.height / 2, background.width * 0.05, background.height/3)
 	statusRect.anchorX = 0
 	statusRect.anchorY = 1
 	statusRect:setFillColor(1,1,0)
@@ -297,7 +331,7 @@ function scene:create( event )
 end
 
 function scene:show( event )
-	local sceneGroup = self.view
+	sceneGroup = self.view
 	local phase = event.phase
 	
 	if phase == "will" then
@@ -308,7 +342,7 @@ function scene:show( event )
 end
 
 function scene:hide( event )
-	local sceneGroup = self.view
+	sceneGroup = self.view
 	
 	local phase = event.phase
 	
@@ -329,7 +363,7 @@ function scene:destroy( event )
 	-- 
 	-- INSERT code here to cleanup the scene
 	-- e.g. remove display objects, remove touch listeners, save state, etc.
-	local sceneGroup = self.view
+	sceneGroup = self.view
 end
 
 ---------------------------------------------------------------------------------
