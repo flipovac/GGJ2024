@@ -1,7 +1,7 @@
 {
     "init_crowd_satisfaction": 0.5,
     "crowd_objective": "negative",
-    "joke_cards": 3,
+    "joke_text_font": "",
     "guest_types": [
         "cat",
         "dog",
@@ -14,9 +14,7 @@
         "dog",
         "shark",
         "bird",
-        "pirate",
-        "karen",
-        "dad_jokes"
+        "pirate"
     ],
     "joke_modifiers": {
         "positive": 1,
@@ -27,9 +25,7 @@
         "cat": {
             "positive": [
                 "dog",
-                "bird",
-                "karen",
-                "dad_jokes"
+                "bird"
             ],
             "negative": [
                 "cat",
@@ -42,9 +38,7 @@
         },
         "dog": {
             "positive": [
-                "cat",
-                "karen",
-                "dad_jokes"
+                "cat"
             ],
             "negative": [
                 "dog",
@@ -58,9 +52,7 @@
         "shark": {
             "positive": [
                 "bird",
-                "pirate",
-                "karen",
-                "dad_jokes"
+                "pirate"
             ],
             "negative": [
                 "dog",
@@ -73,9 +65,7 @@
         "birds": {
             "positive": [
                 "cat",
-                "shark",
-                "karen",
-                "dad_jokes"
+                "shark"
             ],
             "negative": [
                 "bird",
@@ -88,9 +78,7 @@
         "pirate": {
             "positive": [
                 "shark",
-                "pirate",
-                "karen",
-                "dad_jokes"
+                "pirate"
             ],
             "negative": [
                 "cat",
