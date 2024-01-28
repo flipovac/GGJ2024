@@ -58,6 +58,12 @@ local playedCardIndex = 0
 local showCardsBtn = {}
 local foxy = {}
 
+local negativeSounds = {}
+local negativeSoundsIndex = 1
+
+local positiveSounds = {}
+local positiveSoundsIndex = 1
+
 -- Class definitions
 
 local Crowd = {}
@@ -395,10 +401,24 @@ function getCrowdReaction(_totalScore)
 	-- sound i display
 	stageCrowd:display()
 
-	-- todo: play sound
-	-- onCrowdReactionComplete()
-	-- media.playSound(soundfile,baseDir, onCrowdReactionComplete);
+	local options =
+	{
+		channel = 3,
+		loops = -1,
+		fadein = 2000,
+		onComplete=onCrowdReactionComplete
+	}
 
+	local crowdSound = {}
+	if _totalScore > 0 then
+		crowdSound = positiveSounds[positiveSoundsIndex % #positiveSounds + 1]
+		positiveSoundsIndex = positiveSoundsIndex + 1
+	else
+		crowdSound = negativeSounds[negativeSoundsIndex % #negativeSounds + 1]
+		negativeSoundsIndex = negativeSoundsIndex + 1
+	end
+
+	audio.play(crowdSound, options)
 end
 
 function onCrowdReactionComplete()
@@ -447,7 +467,14 @@ function checkEndgame()
 end
 
 function endGame( _isWin )
+	
+	if _isWIn then
+		error("You win!")
+	else
+		error("You lose")
+	end
 
+	composer.removeScene( "stage", false )
 	--todo: endgame, switch scenswitchAe and destroy current
 end
 
@@ -557,6 +584,13 @@ function drawShowCardsBtn()
 	sceneGroup:insert( showCardsBtn )
 end
 
+function loadSounds()
+	positiveSounds[1] = audio.loadSound("res/audio/Cheers3.wav");
+	positiveSounds[2] = audio.loadSound("res/audio/Cheers5.wav");
+
+	negativeSounds[1] = audio.loadSound("res/audio/Boo.wav");
+	negativeSounds[2] = audio.loadSound("res/audio/Boo2.wav"); 
+end
 
 -- ##############################################
 -- Framework functions
@@ -588,7 +622,9 @@ function scene:create( event )
 
 	sceneGroup:insert( background )
 	sceneGroup:insert( foxy )
- 	
+	
+	loadSounds()
+	
 	loadGuestImages()
 
 	-- load structures and shuffle 
