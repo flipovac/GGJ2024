@@ -484,7 +484,7 @@ function playJoke( _cardIndex )
 		totalScore = totalScore + score
 	end
 
-	playedCard
+	jokeCards:replaceCardJoke(_cardIndex)
 
 	crowdSatisfaction = crowdSatisfaction + totalScore
 
