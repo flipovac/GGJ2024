@@ -19,6 +19,7 @@
 local helper = require "helper"
 local composer = require( "composer" )
 local scene = composer.newScene()
+local widget = require "widget"
 
 math.randomseed(os.time())
 
@@ -52,6 +53,10 @@ local CARD_TEXT_HEIGHT = 300 --CARD_HEIGHT * 0.58
 local CARD_TEXT_SIZE = 20
 
 local jokeCards = {}
+local playedCardIndex = 0
+
+local showCardsBtn = {}
+local foxy = {}
 
 -- Class definitions
 
@@ -126,9 +131,6 @@ function Crowd:display()
 		guest.image.isVisible = true;
 
 		guest.annoyedSymbol.isVisible = guest.state == "negative"
-
-		sceneGroup:insert(guest.image)
-		sceneGroup:insert(guest.annoyedSymbol)
 	end
 end
 
@@ -166,6 +168,8 @@ function Guest:rateJoke(_jokeType)
 	else
 		jokeEffect = "positive"
 	end
+
+	print("Joke effect: " .. jokeEffect)
 	
 	local score = jokeModifier[jokeEffect] * self.scoreModifier
 
@@ -200,6 +204,7 @@ function Card:new()
 
 	self.image = {}
 	self.textRect = {}
+	self.cardGroup = {}
 
 	return newObject
 end
@@ -223,14 +228,15 @@ function Cards:new()
 	self.__index = self
 
 	self.cards = {}
-	self.cardGroup = {}
+	self.cardsGroup = {}
 	self.cardPositions = {}
+	self.isVisible = false
 
 	return newObject
 end
 
 function Cards:createCards()
-	self.cardGroup = display.newGroup()
+	self.cardsGroup = display.newGroup()
 
 	local card1 = Card:new()
 	card1:getNextJoke()
@@ -284,39 +290,34 @@ function Cards:prepareCardImages()
 		card.image.y = cardPosition.y
 		card.image.rotation = cardPosition.rotation
 		card.image:addEventListener( "tap", pickCardListener ) 
-	
+		card.image.isVisible = true
+
 		card.textRect = display.newText(textOptions)
+		card.textRect.text = card.jokeText
 		card.textRect.x = cardPosition.x
 		card.textRect.y = cardPosition.y
 		card.textRect.rotation = cardPosition.rotation
 		card.textRect:setFillColor(1,1,1)
+		card.textRect.isVisible = true
 
-		self.cardGroup:insert(card.image) 
-		self.cardGroup:insert(card.textRect)
+		card.cardGroup = display.newGroup()
+		card.cardGroup:insert(card.image)
+		card.cardGroup:insert(card.textRect)
+
+		self.cardsGroup:insert(card.cardGroup) 
 	end
 
-	self.cardGroup.x = halfW
-	self.cardGroup.y = screenH / 2
-	self.cardGroup.anchorX = 0.5
-	self.cardGroup.anchorY = 0.5
-	self.cardGroup.isVisible = false
+	self.cardsGroup.x = halfW
+	self.cardsGroup.y = screenH
+	self.cardsGroup.anchorX = 0.5
+	self.cardsGroup.anchorY = 0.5
+	self.cardsGroup.isVisible = false
 
-	sceneGroup:insert(self.cardGroup)
+	sceneGroup:insert(self.cardsGroup)
 end
 
 function Cards:replaceCardJoke(_cardIndex)
 	cards[_cardIndex]:getNextJoke()
-end
-
-function Cards:display()
-	self.cardGroup.isVisible = true
-
-	for i, card in ipairs(self.cards) do
-		card.textRect.text = card.jokeText 
-
-		card.image.isVisible = true
-		card.textRect.isVisible = true
-	end
 end
 
 -- ##############################################
@@ -362,16 +363,41 @@ function getNextGuestType()
 end
 
 function pickCardListener( event )
-	playJoke(event.target.index) 
+	if not isShowCardsTransition then
+		playedCardIndex = event.target.index
+		
+		for i, card in ipairs (jokeCards.cards) do
+			if ( i == playedCardIndex ) then
+				transition.to(
+					card.cardGroup, {
+						time=1000, 
+						delay=2000,
+						alpha=0,     
+						onComplete = function()
+							playJoke(playedCardIndex)
+						end
+					}
+				)
+			else
+				transition.to(
+					card.cardGroup, {
+						time=1000, 
+						delay=50,
+						alpha=0
+					}
+				)
+			end
+		end
+	end
 end
 
 function getCrowdReaction(_totalScore)
 	-- sound i display
-
 	stageCrowd:display()
+
 	-- todo: play sound
-	
-	-- media.playSound(soundfile,baseDir, );
+	-- onCrowdReactionComplete()
+	-- media.playSound(soundfile,baseDir, onCrowdReactionComplete);
 
 end
 
@@ -383,11 +409,12 @@ function onCrowdReactionComplete()
 	stageCrowd:display()
 
 	updateStatusBar()
+	resetCardsPosition()
 end
 
-function playJoke( _jokeIndex )
+function playJoke( _cardIndex )
 	local totalScore = 0.0
-	local jokeType = jokeCards.cards[_jokeIndex].jokeType
+	local jokeType = jokeCards.cards[_cardIndex].jokeType
 
 	for i, guest in ipairs(stageCrowd.guests) do
 		local score, jokeEffect = guest:rateJoke(jokeType)
@@ -455,7 +482,7 @@ function drawStatusElements()
 	statusRect = display.newRect(display.screenOriginX + 100 , screenH / 2, screenW * 0.05, MAX_STATUS_HEIGHT)
 	statusRect.anchorX = 0
 	statusRect.anchorY = 1
-	statusRect:setFillColor(0,0,0)
+	statusRect:setFillColor(1,1,0)
 	statusRect.height = 0
 
 	sceneGroup:insert(statusRect)
@@ -466,6 +493,70 @@ function updateStatusBar()
 	-- update status
 	statusRect.height = MAX_STATUS_HEIGHT * (crowdSatisfaction / MAX_CROWD_SCORE)
 end
+
+local isShowCardsTransition = false
+
+local function onShowCardsBtnRelease()
+	if ( isShowCardsTransition ~= true ) then
+		isShowCardsTransition = true
+
+		if jokeCards.cardsGroup.isVisible then
+			transition.to(
+				jokeCards.cardsGroup, {
+					time=500, 
+					delay=100,
+					x=halfW,
+					y=screenH,    
+					onComplete = function()
+						jokeCards.cardsGroup.isVisible = false
+						isShowCardsTransition = false
+					end
+				}
+			)
+		else
+			jokeCards.cardsGroup.isVisible = true
+			transition.to(
+				jokeCards.cardsGroup, {
+					time=500, 
+					delay=100,
+					x=halfW,
+					y=screenH / 2,     
+					onComplete = function()
+						isShowCardsTransition = false
+					end
+				}
+			)
+		end
+	end
+	return true	-- indicates successful touch
+end
+
+function resetCardsPosition()
+	jokeCards.cardsGroup.isVisible = false
+	jokeCards.cardsGroup.x = halfW
+	jokeCards.cardsGroup.y = screenH
+
+	for i, card in ipairs(jokeCards.cards) do
+		card.cardGroup.alpha = 1.0
+	end
+end
+
+function drawShowCardsBtn()
+	showCardsBtn = widget.newButton{
+		defaultFile = "res/img/button/note-btn.png",
+		overFile = "res/img/button/note-btn-pressed.png",
+		width = 601 * 0.13, height = 842 * 0.13,
+		onRelease = onShowCardsBtnRelease
+	}
+
+    showCardsBtn.anchorX = 1
+    showCardsBtn.anchorY = 0
+	showCardsBtn.x = display.contentWidth - display.screenOriginX - 30
+	showCardsBtn.y = display.screenOriginY + 30
+
+	sceneGroup:insert( showCardsBtn )
+end
+
 
 -- ##############################################
 -- Framework functions
@@ -489,7 +580,7 @@ function scene:create( event )
 	background.x = 0 + display.screenOriginX 
 	background.y = 0 + display.screenOriginY
 	
-	local foxy = display.newImageRect( "res/img/characters/foxy.png", display.actualContentWidth, display.actualContentHeight )
+	foxy = display.newImageRect( "res/img/characters/foxy.png", display.actualContentWidth, display.actualContentHeight )
 	foxy.anchorX = 0
 	foxy.anchorY = 0
 	foxy.x = 0 + display.screenOriginX 
@@ -522,7 +613,8 @@ function scene:create( event )
 	jokeCards = Cards:new()
 	jokeCards:createCards()
 	jokeCards:prepareCardImages()
-	jokeCards:display()
+
+	drawShowCardsBtn()
 
 	foxy:toFront()
 
