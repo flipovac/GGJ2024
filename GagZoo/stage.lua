@@ -245,6 +245,14 @@ function scene:create( event )
 
 	sceneGroup:insert( background )
 
+	local foxy = display.newImageRect( "res/img/characters/foxy.png", display.actualContentWidth, display.actualContentHeight )
+	foxy.anchorX = 0
+	foxy.anchorY = 0
+	foxy.x = 0 + display.screenOriginX 
+	foxy.y = 0 + display.screenOriginY
+
+	sceneGroup:insert( foxy )
+
 	for i, guest in ipairs(stageCrowd.guests) do
 		guest.image = display.newImageRect( "res/img/characters/" .. guest.type .. "-".. guest.state .. ".png", 0.977 * guest.position[3], guest.position[3] )
 		guest.image.anchorX = 0.5
@@ -284,6 +292,7 @@ function scene:create( event )
 	sceneGroup:insert(statusRect)
 	sceneGroup:insert(statusBorderRect)
 
+	foxy:toFront()
 	-- all display objects must be inserted into group
 end
 

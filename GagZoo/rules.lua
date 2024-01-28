@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------------------
 --
--- intro-backstory.lua
+-- rules.lua
 --
 -----------------------------------------------------------------------------------------
 
@@ -15,9 +15,9 @@ local playBtn
 local screenW, screenH, halfW = display.actualContentWidth, display.actualContentHeight, display.contentCenterX
 
 local function onPlayBtnRelease()
-
-	composer.removeScene( "intro-backstory", false )
-	composer.gotoScene( "rules", "fade", 500 )
+	composer.removeScene( "rules", false )
+	-- go to level1.lua scene
+	composer.gotoScene( "stage", "fade", 500 )
 	
 	return true	-- indicates successful touch
 end
@@ -26,50 +26,45 @@ end
 function scene:create( event )
     local sceneGroup = self.view
 
-    local background = display.newImageRect( "res/img/background/intro-backstory.jpg", display.actualContentWidth, display.actualContentHeight )
+    local background = display.newImageRect( "res/img/background/rules.jpg", display.actualContentWidth, display.actualContentHeight )
 	background.anchorX = 0
 	background.anchorY = 0
 	background.x = 0 + display.screenOriginX 
 	background.y = 0 + display.screenOriginY
 
+    local characterInitialHeight = 400
+    local characterFinalHeight = 170
 
-    local storyText1 = display.newText( "Hello", 0, 0, native.systemFont, 26 )
-    storyText1.x = 50 ; storyText1.y = 120
-    storyText1:setFillColor( 0, 0, 0 )
-    storyText1.alpha = 0
-    storyText1.anchorX = 0
-    storyText1.text = "In the lively town of dreams, I, Oliver, aspired to be a doctor or lawyer, \nbut my comedy-loving parents thrust me onto the stage."
+    local categories = { 'cat', 'dog', 'shark', 'bird', 'pirate' }
+    local categoryFinalX = { 0.26, 0.38, 0.5, 0.63, 0.74 }
 
+    local crowd = {}
 
-    local storyText2 = display.newText( "Hello", 0, 0, native.systemFont, 26 )
-    storyText2.x = 50 ; storyText2.y = 190
-    storyText2:setFillColor( 0, 0, 0 )
-    storyText2.alpha = 0
-    storyText2.anchorX = 0
-    storyText2.text = "Armed with amazing jokes, I now embrace the challenge, \naiming to be the town's worst comedian."
+    for index, crowdType in pairs(categories) do
+        crowd[index] = display.newImageRect( "res/img/characters/" .. crowdType .. "-neutral.png", 0.977 * characterInitialHeight, characterInitialHeight )
+        crowd[index].anchorX = 0.5
+        crowd[index].anchorY = 0.5
+        crowd[index].x = background.width * 0.5 + display.screenOriginX 
+        crowd[index].y = background.height * 0.4 + display.screenOriginY 
+        crowd[index].alpha = 0
+    end
 
+    local start = 500
 
-    local storyText3 = display.newText( "Hello", 0, 0, native.systemFont, 26 )
-    storyText3.x = 50 ; storyText3.y = 260
-    storyText3:setFillColor( 0, 0, 0 )
-    storyText3.alpha = 0
-    storyText3.anchorX = 0
-    storyText3.text = "It's not just laughs I'm after; \nit's the freedom to pursue my dreams beyond the spotlight."
+    for index, xValue in pairs(categoryFinalX) do
+        transition.to( crowd[index], { time=1000, delay=start, alpha=1 } )
+        transition.to( crowd[index], { 
+            time=1000,
+            delay=start + 1000, 
+            width=0.977 * characterFinalHeight, 
+            height=characterFinalHeight, 
+            x = background.width * xValue + display.screenOriginX,
+            y = background.height * 0.89 + display.screenOriginY
+        } )
 
+        start = start + 2000
 
-    local storyText4 = display.newText( "Hello", 0, 0, native.systemFont, 26 )
-    storyText4.x = 50 ; storyText4.y = 320
-    storyText4:setFillColor( 0, 0, 0 )
-    storyText4.alpha = 0
-    storyText4.anchorX = 0
-    storyText4.text = "Let the rebellious journey begin!"
-
-
-    transition.to( storyText1, { time=1500, delay=0, alpha=1 } )
-    transition.to( storyText2, { time=1500, delay=1500, alpha=1 } )
-    transition.to( storyText3, { time=1500, delay=3000, alpha=1 } )
-    transition.to( storyText4, { time=1500, delay=4500, alpha=1 } )
-
+    end
 
     playBtn = widget.newButton{
 		defaultFile = "res/img/button/arrow-next-button.png",
@@ -77,17 +72,18 @@ function scene:create( event )
 		width = 210, height = 100,
 		onRelease = onPlayBtnRelease	-- event listener function
 	}
-    playBtn.anchorX = -1
-    playBtn.anchorY = -1
-	playBtn.x = display.contentWidth - 125
-	playBtn.y = display.contentHeight - 125
+    playBtn.anchorX = 0.5
+    playBtn.anchorY = 0.5
+	playBtn.x = display.contentWidth + display.screenOriginX + 220
+	playBtn.y = display.contentHeight - 80 + display.screenOriginY
 	
 
     sceneGroup:insert( background )
-    sceneGroup:insert( storyText1 )
-    sceneGroup:insert( storyText2 )
-    sceneGroup:insert( storyText3 )
-    sceneGroup:insert( storyText4 )
+    sceneGroup:insert( crowd[1] )
+    sceneGroup:insert( crowd[2] )
+    sceneGroup:insert( crowd[3] )
+    sceneGroup:insert( crowd[4] )
+    sceneGroup:insert( crowd[5] )
 
 end
 
