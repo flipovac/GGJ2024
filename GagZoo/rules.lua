@@ -24,6 +24,8 @@ end
 
 
 function scene:create( event )
+    audio.stop( 1 )
+
     local sceneGroup = self.view
 
     local background = display.newImageRect( "res/img/background/rules.jpg", display.actualContentWidth, display.actualContentHeight )
@@ -36,7 +38,7 @@ function scene:create( event )
     local characterFinalHeight = 170
 
     local categories = { 'cat', 'dog', 'shark', 'bird', 'pirate' }
-    local categoryFinalX = { 0.26, 0.38, 0.5, 0.63, 0.74 }
+    local categoryFinalX = { 0.23, 0.365, 0.5, 0.635, 0.76 }
 
     local crowd = {}
 
@@ -45,26 +47,33 @@ function scene:create( event )
         crowd[index].anchorX = 0.5
         crowd[index].anchorY = 0.5
         crowd[index].x = background.width * 0.5 + display.screenOriginX 
-        crowd[index].y = background.height * 0.4 + display.screenOriginY 
+        crowd[index].y = background.height * 0.5 + display.screenOriginY 
         crowd[index].alpha = 0
     end
 
     local start = 500
 
     for index, xValue in pairs(categoryFinalX) do
-        transition.to( crowd[index], { time=1000, delay=start, alpha=1 } )
+        transition.to( crowd[index], { time=700, delay=start, alpha=1 } )
         transition.to( crowd[index], { 
-            time=1000,
-            delay=start + 1000, 
-            width=0.977 * characterFinalHeight, 
-            height=characterFinalHeight, 
+            time= 700,
+            delay= start + 700, 
+            width= 0.977 * characterFinalHeight, 
+            height= characterFinalHeight, 
             x = background.width * xValue + display.screenOriginX,
             y = background.height * 0.89 + display.screenOriginY
         } )
 
-        start = start + 2000
+        start = start + 1400
 
     end
+
+    local rules = display.newImageRect( "res/img/rules-table.png", 1920 * 0.6, 1080 * 0.6 )
+    rules.x = halfW
+    rules.y = (display.actualContentHeight + display.screenOriginY) * 0.46
+    rules.alpha = 0
+
+    transition.to( rules, { time=1000, delay=start, alpha=1 } )
 
     playBtn = widget.newButton{
 		defaultFile = "res/img/button/arrow-next-button.png",
@@ -84,7 +93,8 @@ function scene:create( event )
     sceneGroup:insert( crowd[3] )
     sceneGroup:insert( crowd[4] )
     sceneGroup:insert( crowd[5] )
-
+    sceneGroup:insert( rules )
+    
 end
 
 
