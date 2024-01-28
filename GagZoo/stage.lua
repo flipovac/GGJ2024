@@ -163,20 +163,54 @@ function Guest:rateJoke(_jokeType)
 	
 	local jokeEffect = "neutral"
 	
-	print("Joke type: " .. _jokeType)
+	-- print("Joke type: " .. _jokeType)
 
-	if not jokeEffects[_jokeType]["positive"][self.type] then
-		if not jokeEffects[_jokeType]["negative"][self.type] then
-			jokeEffect = "neutral"
-		else
-			jokeEffect = "negative"
+	-- if not jokeEffects[_jokeType]["positive"][self.type] then
+	-- 	if not jokeEffects[_jokeType]["negative"][self.type] then
+	-- 		jokeEffect = "neutral"
+	-- 	else
+	-- 		jokeEffect = "negative"
+	-- 	end
+	-- else
+	-- 	jokeEffect = "positive"
+	-- end
+
+	-- print("Joke effect: " .. jokeEffect)
+
+	if _jokeType == "cat" then
+		if self.type == "dog" or self.type == "bird" then
+			jokeEffect = "positive"
+		elseif self.type == "cat" or self.type == "pirate" then 
+			jokeEffect ="negative"
 		end
-	else
-		jokeEffect = "positive"
-	end
+	elseif _jokeType == "dog" then
+		if self.type == "cat" then
+			jokeEffect = "positive"
+		elseif self.type == "dog" or self.type == "shark" then 
+			jokeEffect ="negative"
+		end
+	elseif _jokeType == "shark" then
 
-	print("Joke effect: " .. jokeEffect)
-	
+		if self.type == "bird" or self.type == "pirate" then
+			jokeEffect = "positive"
+		elseif self.type == "dog" or self.type == "shark" then 
+			jokeEffect ="negative"
+		end
+	elseif _jokeType == "bird" then
+		
+		if self.type == "cat" or self.type == "shark" then
+			jokeEffect = "positive"
+		elseif self.type == "bird" or self.type == "pirate" then 
+			jokeEffect ="negative"
+		end 
+	elseif _jokeType == "pirate" then
+		if self.type == "shark" or self.type == "pirate" then
+			jokeEffect = "positive"
+		elseif self.type == "cat" or self.type == "bird" then 
+			jokeEffect ="negative"
+		end 
+	end	
+
 	local score = jokeModifier[jokeEffect] * self.scoreModifier
 
 	return score, jokeEffect;
@@ -400,6 +434,7 @@ end
 function getCrowdReaction(_totalScore)
 	-- sound i display
 	stageCrowd:display()
+
 
 	local options =
 	{
