@@ -50,7 +50,7 @@ local CARD_ROTATION = 3
 
 local CARD_TEXT_WIDTH = CARD_WIDTH * 0.5
 local CARD_TEXT_HEIGHT = 300 --CARD_HEIGHT * 0.58 
-local CARD_TEXT_SIZE = 20
+local CARD_TEXT_SIZE = 30
 
 local jokeCards = {}
 local playedCardIndex = 0
@@ -436,24 +436,23 @@ function getCrowdReaction(_totalScore)
 	stageCrowd:display()
 
 
-	-- local options =
-	-- {
-	-- 	channel = 3,
-	-- 	loops = -1,
-	-- 	fadein = 2000,
-	-- 	onComplete=onCrowdReactionComplete
-	-- }
+	local options =
+	{
+		channel = 3,
+		loops = 0,
+		fadein = 2000
+	}
 
-	-- local crowdSound = {}
-	-- if _totalScore > 0 then
-	-- 	crowdSound = positiveSounds[positiveSoundsIndex % #positiveSounds + 1]
-	-- 	positiveSoundsIndex = positiveSoundsIndex + 1
-	-- else
-	-- 	crowdSound = negativeSounds[negativeSoundsIndex % #negativeSounds + 1]
-	-- 	negativeSoundsIndex = negativeSoundsIndex + 1
-	-- end
+	local crowdSound = {}
+	if _totalScore > 0 then
+		crowdSound = positiveSounds[positiveSoundsIndex % #positiveSounds + 1]
+		positiveSoundsIndex = positiveSoundsIndex + 1
+	else
+		crowdSound = negativeSounds[negativeSoundsIndex % #negativeSounds + 1]
+		negativeSoundsIndex = negativeSoundsIndex + 1
+	end
 
-	-- audio.play(crowdSound, options)
+	audio.play(crowdSound, options)
 
 	timer.performWithDelay(2000,onCrowdReactionComplete, 1);
 end

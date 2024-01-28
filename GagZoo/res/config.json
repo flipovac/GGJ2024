@@ -17,8 +17,8 @@
         "pirate"
     ],
     "joke_modifiers": {
-        "positive": 5,
-        "negative": -5,
+        "positive": 3,
+        "negative": -3,
         "neutral": 0
     },
     "joke_effects": {
