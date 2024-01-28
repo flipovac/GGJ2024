@@ -44,17 +44,18 @@ function scene:create( event )
 		return true	-- indicates successful touch
 	end
 
-    showCardsBtn = widget.newButton{
-		label = "SHOW CARDS",
-		defaultFile = "res/img/button/arrow-next-button.png",
-		overFile = "res/img/button/arrow-next-button-clicked.png",
-		width = 210, height = 100,
-		onRelease = onShowCardsBtnRelease	-- event listener function
+	showCardsBtn = widget.newButton{
+		defaultFile = "res/img/button/note-btn.png",
+		overFile = "res/img/button/note-btn-pressed.png",
+		width = 601 * 0.13, height = 842 * 0.13,
+		onRelease = onShowCardsBtnRelease
 	}
-    showCardsBtn.anchorX = -1
-    showCardsBtn.anchorY = -1
-	showCardsBtn.x = display.contentWidth - 125
-	showCardsBtn.y = display.contentHeight - 125
+    showCardsBtn.anchorX = 1
+    showCardsBtn.anchorY = 0
+	showCardsBtn.x = display.contentWidth - display.screenOriginX - 30
+	showCardsBtn.y = display.screenOriginY + 30
+
+	sceneGroup:insert( showCardsBtn )
 
 	local cards = {}
 
