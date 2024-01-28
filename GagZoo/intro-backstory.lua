@@ -22,6 +22,15 @@ local function onNextBtnRelease()
 end
 
 function scene:create( event )
+
+	local options =
+	{
+		channel = 1,
+		loops = -1,
+		fadein = 2000,
+	}
+
+	audio.play( introSound, options )
     local sceneGroup = self.view
 	local nextBtn
 	local playBtn
@@ -31,36 +40,38 @@ function scene:create( event )
 	background.anchorY = 0
 	background.x = 0 + display.screenOriginX 
 	background.y = 0 + display.screenOriginY
+	
+	local paperOrnamentFoxy = display.newImageRect( "res/img/foxy-drawing.png", 462 * 0.9, 366 * 0.9 )
+	paperOrnamentFoxy.anchorX = 1
+	paperOrnamentFoxy.anchorY = 1
+	paperOrnamentFoxy.x = screenW * 0.65
+	paperOrnamentFoxy.y = screenH * 1.06
 
+	local shiftDown = 20
 
-    local storyText1 = display.newText( "Hello", 0, 0, native.systemFont, 26 )
-    storyText1.x = 50 ; storyText1.y = 120
+    local storyText1 = display.newText( "In the bustling town of dreams, I, Oliver, \naspired to be a doctor or lawyer, \nbut my comedy-loving parents, \nshut down my career plans with a resounding, \n\"No, you're going to be a comedian!\"", 0, 0, native.systemFont, 24 )
+    storyText1.x = halfW + 90 ; storyText1.y = 230 + shiftDown
     storyText1:setFillColor( 0, 0, 0 )
     storyText1.alpha = 0
     storyText1.anchorX = 0
-    storyText1.text = "In the bustling town of dreams, I, Oliver, aspired to be a doctor or lawyer, \nbut my comedy-loving parents, shut down my career plans with a resounding, \n\"No, you're going to be a comedian!\""
 
-    local storyText2 = display.newText( "Hello", 0, 0, native.systemFont, 26 )
-    storyText2.x = 50 ; storyText2.y = 190
+    local storyText2 = display.newText( "Armed with jokes that even dad would cringe at, \nI now embrace the challenge, \naiming to be the town's worst comedian.", 0, 0, native.systemFont, 24 )
+    storyText2.x = halfW + 90 ; storyText2.y = 360 + shiftDown
     storyText2:setFillColor( 0, 0, 0 )
     storyText2.alpha = 0
     storyText2.anchorX = 0
-    storyText2.text = "Armed with jokes that even dad would cringe at, I now embrace the challenge, \naiming to be the town's worst comedian."
 
-    local storyText3 = display.newText( "Hello", 0, 0, native.systemFont, 26 )
-    storyText3.x = 50 ; storyText3.y = 260
+    local storyText3 = display.newText( "It's not laughs I'm after, \nit's the freedom to pursue my dreams \nbeyond the spotlight.", 0, 0, native.systemFont, 24 )
+    storyText3.x = halfW + 90 ; storyText3.y = 465 + shiftDown
     storyText3:setFillColor( 0, 0, 0 )
     storyText3.alpha = 0
     storyText3.anchorX = 0
-    storyText3.text = "It's not laughs I'm after, \nit's the freedom to pursue my dreams beyond the spotlight."
 
-
-    local storyText4 = display.newText( "Hello", 0, 0, native.systemFont, 26 )
-    storyText4.x = 50 ; storyText4.y = 320
+    local storyText4 = display.newText( "Let the rebellious journey begin!", 0, 0, native.systemFont, 24 )
+    storyText4.x = halfW + 160 ; storyText4.y = 570 + shiftDown
     storyText4:setFillColor( 0, 0, 0 )
     storyText4.alpha = 0
     storyText4.anchorX = 0
-    storyText4.text = "Let the rebellious journey begin!"
 
 
     nextBtn = widget.newButton{
@@ -71,10 +82,10 @@ function scene:create( event )
 		onRelease = onNextBtnRelease,
 		isEnabled = false,
 	}
-    nextBtn.anchorX = -1
-    nextBtn.anchorY = -1
-	nextBtn.x = display.contentWidth - 125
-	nextBtn.y = display.contentHeight - 125
+    nextBtn.anchorX = 0.5
+    nextBtn.anchorY = 0.5
+	nextBtn.x = display.contentWidth + display.screenOriginX + 220
+	nextBtn.y = display.contentHeight - 80 + display.screenOriginY
 
 
     local curtainLeft = display.newImageRect( "res/img/background/curtain-left.png", display.actualContentWidth, display.actualContentHeight )
@@ -82,12 +93,15 @@ function scene:create( event )
 	curtainLeft.anchorY = 0
 	curtainLeft.x = 0 + display.screenOriginX 
 	curtainLeft.y = 0 + display.screenOriginY
+	-- curtainLeft.alpha = 0
+
 	
 	local curtainRight = display.newImageRect( "res/img/background/curtain-right.png", display.actualContentWidth, display.actualContentHeight )
 	curtainRight.anchorX = 0
 	curtainRight.anchorY = 0
 	curtainRight.x = 0 + display.screenOriginX 
 	curtainRight.y = 0 + display.screenOriginY
+	-- curtainRight.alpha = 0
 
 
 	local function onPlayBtnRelease()
@@ -131,10 +145,10 @@ function scene:create( event )
 			}
 		)
 
-		transition.to( storyText1, { time=1500, delay=2000, alpha=1 } )
-		transition.to( storyText2, { time=1500, delay=3500, alpha=1 } )
-		transition.to( storyText3, { time=1500, delay=5000, alpha=1 } )
-		transition.to( storyText4, { time=1500, delay=6500, alpha=1 } )
+		transition.to( storyText1, { time=2500, delay=2000, alpha=1 } )
+		transition.to( storyText2, { time=2500, delay=4500, alpha=1 } )
+		transition.to( storyText3, { time=2500, delay=6000, alpha=1 } )
+		transition.to( storyText4, { time=2500, delay=8500, alpha=1 } )
 		
 		return true	-- indicates successful touch
 	end
@@ -152,6 +166,7 @@ function scene:create( event )
 
 
     sceneGroup:insert( background )
+	sceneGroup:insert( paperOrnamentFoxy )
     sceneGroup:insert( storyText1 )
     sceneGroup:insert( storyText2 )
     sceneGroup:insert( storyText3 )
@@ -190,6 +205,15 @@ function scene:hide( event )
 		-- INSERT code here to pause the scene
 		-- e.g. stop timers, stop animation, unload sounds, etc.)
 	elseif phase == "did" then
+
+		local options =
+		{
+			channel = 1,
+			loops = -1,
+			fadein = 2000,
+		}
+
+		audio.play( introSound, options )
 		-- Called when the scene is now off screen
 	end	
 	
