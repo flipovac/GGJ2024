@@ -40,6 +40,12 @@ function scene:create( event )
 	background.anchorY = 0
 	background.x = 0 + display.screenOriginX 
 	background.y = 0 + display.screenOriginY
+
+	local title = display.newImageRect( "res/img/menu-title.png", display.actualContentWidth, display.actualContentHeight )
+	title.anchorX = 0
+	title.anchorY = 0
+	title.x = 0 + display.screenOriginX 
+	title.y = 0 + display.screenOriginY
 	
 	local paperOrnamentFoxy = display.newImageRect( "res/img/foxy-drawing.png", 462 * 0.9, 366 * 0.9 )
 	paperOrnamentFoxy.anchorX = 1
@@ -123,6 +129,15 @@ function scene:create( event )
 		)
 
 		transition.to(
+			title, 
+			{
+				time=700, 
+				delay=100,
+				alpha=0, 
+			}
+		)
+
+		transition.to(
 			curtainLeft, 
 			{
 				time=3300, 
@@ -179,6 +194,8 @@ function scene:create( event )
 	sceneGroup:insert( curtainRight )
 	sceneGroup:insert( curtainRight )
 	sceneGroup:insert( playBtn )
+	sceneGroup:insert( title )
+
 
 end
 
