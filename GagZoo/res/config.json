@@ -17,8 +17,8 @@
         "pirate"
     ],
     "joke_modifiers": {
-        "positive": 1,
-        "negative": -1,
+        "positive": 5,
+        "negative": -5,
         "neutral": 0
     },
     "joke_effects": {
@@ -62,7 +62,7 @@
                 "cat"
             ]
         },
-        "birds": {
+        "bird": {
             "positive": [
                 "cat",
                 "shark"
