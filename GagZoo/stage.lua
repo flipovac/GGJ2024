@@ -559,6 +559,7 @@ local function onShowCardsBtnRelease()
 end
 
 function resetCardsPosition()
+	isShowCardsTransition = false
 	jokeCards.cardsGroup.isVisible = false
 	jokeCards.cardsGroup.x = halfW
 	jokeCards.cardsGroup.y = screenH
