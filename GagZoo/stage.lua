@@ -27,7 +27,7 @@ local screenW, screenH, halfW = display.actualContentWidth, display.actualConten
 
 local stageCrowd = {}
 
-local MAX_CROWD_SCORE = 1.0
+local MAX_CROWD_SCORE = 100.0
 local MIN_CROWD_SCORE = 0.0
 
 local crowdSatisfaction = 0.0
@@ -97,6 +97,9 @@ function Guest:new()
     self.scoreModifier = 1.0
     self.state = "neutral"
 
+	self.image = {}
+	self.annoying_symbol = {}
+
 	return newObject
 end
 
@@ -123,7 +126,7 @@ end
 function Guest:reset( _type )
 	self.type = _type
 	self.scoreModifier = 1.0
-	self.state = "neutral"
+	self.state = "negative"
 end
 
 function Guest:setState ( _state )
@@ -224,7 +227,7 @@ function scene:create( event )
 	
 	print("pocetak ---------------------");
 
-	crowdSatisfcation = jsonConfiguration["init_crowd_satisfaction"]
+	crowdSatisfcation = jsonConfiguration["init_crowd_satisfaction"] * MAX_CROWD_SCORE
 	
 	crowdObjectiveEffect = jsonConfiguration["crowd_objective"]
 	
@@ -243,14 +246,43 @@ function scene:create( event )
 	sceneGroup:insert( background )
 
 	for i, guest in ipairs(stageCrowd.guests) do
-		guest.image = display.newImageRect( "res/img/characters/" .. guest.type .. "-neutral.png", 0.977 * guest.position[3], guest.position[3] )
+		guest.image = display.newImageRect( "res/img/characters/" .. guest.type .. "-".. guest.state .. ".png", 0.977 * guest.position[3], guest.position[3] )
 		guest.image.anchorX = 0.5
 		guest.image.anchorY = 0.5
 		guest.image.x = background.width * guest.position[1] + display.screenOriginX 
 		guest.image.y = background.height * guest.position[2] + display.screenOriginY 
-		
+		guest.image.isVisible = true
+
+		guest.annoying_symbol = display.newImageRect( "res/img/anger_symbol.png", 0.2 * guest.position[3], 0.2 * guest.position[3] )
+		guest.annoying_symbol.anchorX = 0.5
+		guest.annoying_symbol.anchorY = 0.5
+		guest.annoying_symbol.rotation = 30
+		guest.annoying_symbol.x = background.width * guest.position[1] + display.screenOriginX + guest.position[3] / 4.5 
+		guest.annoying_symbol.y = background.height * guest.position[2] + display.screenOriginY - guest.position[3] / 4
+		guest.annoying_symbol.isVisible = true
 		sceneGroup:insert(guest.image)
+
+		sceneGroup:insert(guest.annoying_symbol)
 	end
+
+	-- draw status
+
+	-- status border
+	local statusBorderRect = display.newRect(-100, background.height / 2, background.width * 0.05, background.height/3 )
+	statusBorderRect.strokeWidth = 5
+	statusBorderRect.anchorX = 0
+	statusBorderRect.anchorY = 1
+	statusBorderRect:setFillColor(0,0,0,0)
+	statusBorderRect:setStrokeColor(.1,.2,1)
+
+	local statusRect = display.newRect(-100, background.height / 2, background.width * 0.05, background.height/3)
+	statusRect.anchorX = 0
+	statusRect.anchorY = 1
+	statusRect:setFillColor(1,1,0)
+	statusRect.height = background.height/3 * (70/ MAX_CROWD_SCORE)
+
+	sceneGroup:insert(statusRect)
+	sceneGroup:insert(statusBorderRect)
 
 	-- all display objects must be inserted into group
 end
