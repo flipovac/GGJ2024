@@ -26,6 +26,15 @@ end
 function scene:create( event )
     audio.stop( 1 )
 
+    local options =
+	{
+		channel = 2,
+		loops = -1,
+		fadein = 2000,
+	}
+
+	audio.play( gameplaySound, options )
+
     local sceneGroup = self.view
 
     local background = display.newImageRect( "res/img/background/rules.jpg", display.actualContentWidth, display.actualContentHeight )
