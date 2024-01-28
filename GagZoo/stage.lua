@@ -455,7 +455,7 @@ function getCrowdReaction(_totalScore)
 
 	-- audio.play(crowdSound, options)
 
-	timer.performWithDelay(2000,onCrowdReactionComplete, -1);
+	timer.performWithDelay(2000,onCrowdReactionComplete, 1);
 end
 
 function onCrowdReactionComplete()
