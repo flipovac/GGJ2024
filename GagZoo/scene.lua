@@ -110,13 +110,33 @@ function scene:create( event )
 	crowdImgs[12].x = background.width * 0.59 + display.screenOriginX 
 	crowdImgs[12].y = background.height * 0.58 + display.screenOriginY 
 
-	crowdImgs[13] = display.newImageRect( "res/img/characters/pirate-neutral.png", 0.977 * firstRowCharHeight, firstRowCharHeight )
-	crowdImgs[13].anchorX = 0.5
-	crowdImgs[13].anchorY = 0.5
-	crowdImgs[13].x = background.width * 0.735 + display.screenOriginX 
-	crowdImgs[13].y = background.height * 0.58 + display.screenOriginY 
+	-- crowdImgs[13] = display.newImageRect( "res/img/characters/pirate-neutral.png", 0.977 * firstRowCharHeight, firstRowCharHeight )
+	-- crowdImgs[13].anchorX = 0.5
+	-- crowdImgs[13].anchorY = 0.5
+	-- crowdImgs[13].x = background.width * 0.735 + display.screenOriginX 
+	-- crowdImgs[13].y = background.height * 0.58 + display.screenOriginY 
+
+
+
+	local image1 = { type="image", filename="res/img/characters/bird-angry.png" }
+	local image2 = { type="image", filename="res/img/characters/pirate-angry.png" }
+
+	crowdImgs[13] = display.newRect( 
+		background.width * 0.735 + display.screenOriginX, 
+		background.height * 0.58 + display.screenOriginY, 
+		0.977 * firstRowCharHeight, 
+		firstRowCharHeight 
+	)
+
+	crowdImgs[13].fill = image2
+
 
     sceneGroup:insert( background )
+    sceneGroup:insert( crowdImgs[1] )
+
+	-- crowdImgs[1].filename = "res/img/characters/bird-angry.png"
+	-- crowdImgs[1]:removeSelf();
+
 
 
 	-- crowdImgs[i] = display.newImageRect( "res/img/characters/bird-neutral.png", 0.977 * guestPosition[3], guestPosition[3] )
