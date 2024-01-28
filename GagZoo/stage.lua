@@ -34,17 +34,31 @@ local crowdSatisfaction = 0.0
 
 local currentJokeCards = {}
 
-local jokeModifier = {}
-
 local sceneGoup = nil
 
 local guestImages = {}
+
+local MAX_STATUS_HEIGHT = screenH / 3.0
+local statusRect = {}
+
+local jokeTextIndex = {}
+
+local CARD_HEIGHT = 750 
+local CARD_WIDTH = CARD_HEIGHT * 0.69
+local CARD_ROTATION = 3
+
+local CARD_TEXT_WIDTH = CARD_WIDTH * 0.5
+local CARD_TEXT_HEIGHT = 300 --CARD_HEIGHT * 0.58 
+local CARD_TEXT_SIZE = 20
+
+local jokeCards = {}
 
 -- Class definitions
 
 local Crowd = {}
 local Guest = {}
 local Cards = {}
+local Card = {}
 
 function Crowd:new()
     local newObject = setmetatable({}, self)
@@ -75,7 +89,7 @@ function Crowd:createStageCrowd()
 	end
 end
 
-function Crowd:resetAngryGuests()
+function Crowd:switchAngryGuests()
 	for i, guest in ipairs(stageCrowd.guests) do
 		if guest.state == "negative" then
 			guest:reset(getNextGuestType())
@@ -83,7 +97,7 @@ function Crowd:resetAngryGuests()
 	end
 end
 
-function Crowd:prepareImageRects()
+function Crowd:prepareGuestImages()
 	for i, guest in ipairs(stageCrowd.guests) do
 		-- samo rect , fill dolazi kasnije u displayu
 		guest.image = display.newRect(0, 0, 0.977 * guest.position[3], guest.position[3] )
@@ -135,13 +149,16 @@ function Guest:new()
 	return newObject
 end
 
-function Guest:rateJoke(_joke)
-	local score = 0;
-	local jokeEffect = "neutral"
+function Guest:rateJoke(_jokeType)
 	local jokeEffects = jsonConfiguration["joke_effects"]
+	local jokeModifier = jsonConfiguration["joke_modifiers"]
+	
+	local jokeEffect = "neutral"
+	
+	print("Joke type: " .. _jokeType)
 
-	if not jokeEffects["positive"][self.type] then
-		if not jokeEffects["negative"][self.type] then
+	if not jokeEffects[_jokeType]["positive"][self.type] then
+		if not jokeEffects[_jokeType]["negative"][self.type] then
 			jokeEffect = "neutral"
 		else
 			jokeEffect = "negative"
@@ -150,7 +167,7 @@ function Guest:rateJoke(_joke)
 		jokeEffect = "positive"
 	end
 	
-	score = jokeModifier[jokeEffect] * self.scoreModifier
+	local score = jokeModifier[jokeEffect] * self.scoreModifier
 
 	return score, jokeEffect;
 end
@@ -173,13 +190,133 @@ function Guest:incrementModifier()
 	self.scoreModifier = self.scoreModifier + 0.1
 end
 
+function Card:new()
+	local newObject = setmetatable({}, self)
+	self.__index = self
+
+	self.jokeType = ""
+	self.jokeText = ""
+	self.isPlayed = false
+
+	self.image = {}
+	self.textRect = {}
+
+	return newObject
+end
+
+function Card:getNextJoke()
+	-- todo: dohvati novi joke iz deka/ random ali da nisu u ruci svi istog tipa
+	local jokeTypes = jsonConfiguration["joke_types"] 
+	local jokeIndex = math.random(0, 100) % #jokeTypes + 1
+	
+	self.jokeType = jokeTypes[jokeIndex]
+	
+	local jokesForType = jokeTextIndex[self.jokeType]
+
+	self.jokeText = jokesForType.texts[jokesForType.index % #jokesForType.texts + 1]
+
+	jokesForType.index = jokesForType.index + 1
+end
+
 function Cards:new()
 	local newObject = setmetatable({}, self)
 	self.__index = self
 
 	self.cards = {}
+	self.cardGroup = {}
+	self.cardPositions = {}
 
 	return newObject
+end
+
+function Cards:createCards()
+	self.cardGroup = display.newGroup()
+
+	local card1 = Card:new()
+	card1:getNextJoke()
+	self.cards[1] = card1
+	self.cardPositions[1] = {
+		x = -530 * 0.69,
+		y = 0,
+		rotation = -CARD_ROTATION
+	}
+
+	local card2 = Card:new()
+	card2:getNextJoke()
+	self.cards[2] = card2
+	self.cardPositions[2] = {
+		x = 0,
+		y = -20,
+		rotation = 0
+	}
+
+	card3 = Card:new()
+	card3:getNextJoke()
+	self.cards[3] = card3
+	self.cardPositions[3] = {
+		x = 530 * 0.69,
+		y = 0,
+		rotation = CARD_ROTATION
+	}
+end
+
+function Cards:prepareCardImages()
+	local textOptions =
+	{
+		text = "",
+		x = 0,
+		y = 0,
+		width = CARD_TEXT_WIDTH,
+		height = CARD_TEXT_HEIGHT,
+		font = native.systemFont,   
+		fontSize = CARD_TEXT_SIZE,
+		align = "center"
+	}
+
+	for i, card in ipairs(self.cards) do
+		local cardPosition = self.cardPositions[i]
+
+		card.image = display.newImageRect( "res/img/note.png", CARD_WIDTH * 0.69, CARD_WIDTH )
+		card.image.index = i
+		card.image.anchorX = 0.5
+		card.image.anchorY = 0.5
+		card.image.x = cardPosition.x
+		card.image.y = cardPosition.y
+		card.image.rotation = cardPosition.rotation
+		card.image:addEventListener( "tap", pickCardListener ) 
+	
+		card.textRect = display.newText(textOptions)
+		card.textRect.x = cardPosition.x
+		card.textRect.y = cardPosition.y
+		card.textRect.rotation = cardPosition.rotation
+		card.textRect:setFillColor(1,1,1)
+
+		self.cardGroup:insert(card.image) 
+		self.cardGroup:insert(card.textRect)
+	end
+
+	self.cardGroup.x = halfW
+	self.cardGroup.y = screenH / 2
+	self.cardGroup.anchorX = 0.5
+	self.cardGroup.anchorY = 0.5
+	self.cardGroup.isVisible = false
+
+	sceneGroup:insert(self.cardGroup)
+end
+
+function Cards:replaceCardJoke(_cardIndex)
+	cards[_cardIndex]:getNextJoke()
+end
+
+function Cards:display()
+	self.cardGroup.isVisible = true
+
+	for i, card in ipairs(self.cards) do
+		card.textRect.text = card.jokeText 
+
+		card.image.isVisible = true
+		card.textRect.isVisible = true
+	end
 end
 
 -- ##############################################
@@ -194,6 +331,28 @@ function shuffleAllJokes( )
 	helper.shuffleTable( birdJokes )
 end
 
+function indexJokeTexts()
+	jokeTextIndex["pirate"] = {}
+	jokeTextIndex["pirate"].index = 1
+	jokeTextIndex["pirate"].texts = pirateJokes
+	
+	jokeTextIndex["cat"] = {}
+	jokeTextIndex["cat"].index = 1
+	jokeTextIndex["cat"].texts = catJokes
+	
+	jokeTextIndex["dog"] = {}
+	jokeTextIndex["dog"].index = 1
+	jokeTextIndex["dog"].texts = dogJokes
+	
+	jokeTextIndex["shark"] = {}
+	jokeTextIndex["shark"].index = 1
+	jokeTextIndex["shark"].texts = sharkJokes
+	
+	jokeTextIndex["bird"] = {}
+	jokeTextIndex["bird"].index = 1
+	jokeTextIndex["bird"].texts = birdJokes
+end
+
 function getNextGuestType()
 	-- todo: novi tip gosta na random ili da se ne ponovi svi isti, da postoji omjer
 	local guestTypes = jsonConfiguration["guest_types"]
@@ -202,23 +361,47 @@ function getNextGuestType()
 	return guestTypes[guestIndex]
 end
 
-function getNextJoke()
-	-- todo: dohvati novi joke iz deka/ random ali da nisu u ruci svi istog tipa
+function pickCardListener( event )
+	playJoke(event.target.index) 
 end
 
-function playJoke( _joke )
+function getCrowdReaction(_totalScore)
+	-- sound i display
+
+	stageCrowd:display()
+	-- todo: play sound
+	
+	-- media.playSound(soundfile,baseDir, );
+
+end
+
+function onCrowdReactionComplete()
+	checkEndgame()
+
+	--else nije kraj igri, promjeni publiku i update status bar-a
+	stageCrowd:switchAngryGuests()
+	stageCrowd:display()
+
+	updateStatusBar()
+end
+
+function playJoke( _jokeIndex )
 	local totalScore = 0.0
+	local jokeType = jokeCards.cards[_jokeIndex].jokeType
 
 	for i, guest in ipairs(stageCrowd.guests) do
-		local score, jokeEffect = guest:rateJoke(_joke)
+		local score, jokeEffect = guest:rateJoke(jokeType)
 		
 		guest:setState(jokeEffect)
 
 		totalScore = totalScore + score
 	end
 
-	return totalScore
+	crowdSatisfaction = crowdSatisfaction + totalScore
+
+	getCrowdReaction(totalScore)
 end
+
 
 function checkEndgame()
 	if crowdObjectiveEffect == "positive" then
@@ -234,8 +417,6 @@ function checkEndgame()
 			endgame(false)
 		end
 	end
-
-	return 
 end
 
 function endGame( _isWin )
@@ -244,6 +425,7 @@ function endGame( _isWin )
 end
 
 -----------------------------------------------
+
 function loadGuestImages()
 	local guestTypes = jsonConfiguration["guest_types"]
 	
@@ -258,7 +440,32 @@ function loadGuestImages()
 		guestImages[guestType]["negative"] = imageNegative
 		guestImages[guestType]["neutral"] = imageNeutral
  	end
-end 
+end
+
+function drawStatusElements()
+	-- status border
+	local statusBorderRect = display.newRect(display.screenOriginX + 100, screenH / 2, screenW * 0.05, MAX_STATUS_HEIGHT)
+	statusBorderRect.strokeWidth = 5
+	statusBorderRect.anchorX = 0
+	statusBorderRect.anchorY = 1
+	statusBorderRect:setFillColor(0,0,0,0)
+	statusBorderRect:setStrokeColor(.1,.2,1)
+	
+	-- status rect
+	statusRect = display.newRect(display.screenOriginX + 100 , screenH / 2, screenW * 0.05, MAX_STATUS_HEIGHT)
+	statusRect.anchorX = 0
+	statusRect.anchorY = 1
+	statusRect:setFillColor(0,0,0)
+	statusRect.height = 0
+
+	sceneGroup:insert(statusRect)
+	sceneGroup:insert(statusBorderRect)
+end
+
+function updateStatusBar()
+	-- update status
+	statusRect.height = MAX_STATUS_HEIGHT * (crowdSatisfaction / MAX_CROWD_SCORE)
+end
 
 -- ##############################################
 -- Framework functions
@@ -293,40 +500,32 @@ function scene:create( event )
  	
 	loadGuestImages()
 
-	-- setup game specific parameters
-
-	crowdSatisfcation = jsonConfiguration["init_crowd_satisfaction"] * MAX_CROWD_SCORE
+	-- load structures and shuffle 
 	
+	shuffleAllJokes()
+	indexJokeTexts()
+
+	crowdSatisfaction = jsonConfiguration["init_crowd_satisfaction"] * MAX_CROWD_SCORE
 	crowdObjectiveEffect = jsonConfiguration["crowd_objective"]
+
+	-- setup game specific parameters
 	
 	stageCrowd = Crowd:new()
 	Crowd:createStageCrowd()
-	Crowd:prepareImageRects()
-
-	shuffleAllJokes()
-
+	Crowd:prepareGuestImages()
 	stageCrowd:display()
+	
+	drawStatusElements()
 
-	-- draw status
+	updateStatusBar()
 
-	-- status border
-	local statusBorderRect = display.newRect(display.screenOriginX + 100, background.height / 2, background.width * 0.05, background.height/3 )
-	statusBorderRect.strokeWidth = 5
-	statusBorderRect.anchorX = 0
-	statusBorderRect.anchorY = 1
-	statusBorderRect:setFillColor(0,0,0,0)
-	statusBorderRect:setStrokeColor(.1,.2,1)
-
-	local statusRect = display.newRect(display.screenOriginX + 100 , background.height / 2, background.width * 0.05, background.height/3)
-	statusRect.anchorX = 0
-	statusRect.anchorY = 1
-	statusRect:setFillColor(1,1,0)
-	statusRect.height = background.height/3 * (70/ MAX_CROWD_SCORE)
-
-	sceneGroup:insert(statusRect)
-	sceneGroup:insert(statusBorderRect)
+	jokeCards = Cards:new()
+	jokeCards:createCards()
+	jokeCards:prepareCardImages()
+	jokeCards:display()
 
 	foxy:toFront()
+
 	-- all display objects must be inserted into group
 end
 
