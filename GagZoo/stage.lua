@@ -464,6 +464,7 @@ function onCrowdReactionComplete()
 	--else nije kraj igri, promjeni publiku i update status bar-a
 	stageCrowd:switchAngryGuests()
 	stageCrowd:display()
+	jokeCards.cards[playedCardIndex].textRect.text = jokeCards.cards[playedCardIndex].jokeText
 
 	updateStatusBar()
 	resetCardsPosition()
