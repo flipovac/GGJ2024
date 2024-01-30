@@ -690,11 +690,11 @@ function drawShowCardsBtn()
 end
 
 function loadSounds()
-	positiveSounds[1] = audio.loadSound("res/audio/Cheers3.wav");
-	positiveSounds[2] = audio.loadSound("res/audio/Cheers5.wav");
+	positiveSounds[1] = audio.loadSound("res/audio/Cheers3.mp3");
+	positiveSounds[2] = audio.loadSound("res/audio/Cheers5.mp3");
 
-	negativeSounds[1] = audio.loadSound("res/audio/Boo.wav");
-	negativeSounds[2] = audio.loadSound("res/audio/Boo2.wav"); 
+	negativeSounds[1] = audio.loadSound("res/audio/Boo.mp3");
+	negativeSounds[2] = audio.loadSound("res/audio/Boo2.mp3"); 
 end
 
 -- ##############################################
