@@ -37,7 +37,7 @@ display.setStatusBar( display.HiddenStatusBar )
 -- include the Corona "composer" module
 local composer = require "composer"
 
-introSound = audio.loadSound( "res/audio/intro.wav" )
-gameplaySound = audio.loadSound( "res/audio/gameplay.wav" )
+introSound = audio.loadSound( "res/audio/intro16.wav" )
+gameplaySound = audio.loadSound( "res/audio/gameplay16.wav" )
 -- load menu screen
 composer.gotoScene( "intro-backstory" )
