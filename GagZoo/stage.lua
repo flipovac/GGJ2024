@@ -435,6 +435,7 @@ function getCrowdReaction(_totalScore)
 	-- sound i display
 	stageCrowd:display()
 
+	updateStatusBar()
 
 	local options =
 	{
@@ -454,7 +455,7 @@ function getCrowdReaction(_totalScore)
 
 	audio.play(crowdSound, options)
 
-	timer.performWithDelay(2000,onCrowdReactionComplete, 1);
+	timer.performWithDelay(2500, onCrowdReactionComplete, 1);
 end
 
 function onCrowdReactionComplete()
@@ -465,7 +466,6 @@ function onCrowdReactionComplete()
 	stageCrowd:display()
 	jokeCards.cards[playedCardIndex].textRect.text = jokeCards.cards[playedCardIndex].jokeText
 
-	updateStatusBar()
 	resetCardsPosition()
 end
 
