@@ -622,7 +622,17 @@ end
 
 function updateStatusBar()
 	-- update status
-	statusRect.height = MAX_STATUS_HEIGHT * (crowdSatisfaction / MAX_CROWD_SCORE)
+	local statusHeightModifier = 0
+
+	if crowdSatisfaction > MAX_CROWD_SCORE then
+		statusHeightModifier = 1
+	elseif crowdSatisfaction < MIN_CROWD_SCORE then
+		statusHeightModifier = 0
+	else
+		statusHeightModifier = crowdSatisfaction / MAX_CROWD_SCORE
+	end
+
+	statusRect.height = MAX_STATUS_HEIGHT * statusHeightModifier
 end
 
 local isShowCardsTransition = false
